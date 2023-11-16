@@ -5,7 +5,7 @@ import (
 	"strings"
 )
 
-type Solution func(input []byte) string
+type Solution func([]byte) string
 
 type Part struct {
 	number   uint
