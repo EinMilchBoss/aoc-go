@@ -39,8 +39,11 @@ func partOne(data []byte) uint {
 	for _, line := range strings.Split(input, "\n") {
 		runes := []rune(line)
 		opp, ply := OppMove(runes[0]), PlyMove(runes[2])
-		outcome, move := uint(getOutcome(opp, ply)), getMovePoints(ply)
-		points += outcome + move
+		out := getOutcome(opp, ply)
+
+		outPoints := uint(out)
+		movePoints := getMovePoints(ply)
+		points += outPoints + movePoints
 	}
 
 	return points
@@ -56,9 +59,10 @@ func getMovePoints(move PlyMove) uint {
 		return 1
 	case PlyPaper:
 		return 2
-	default:
+	case PlyScissors:
 		return 3
 	}
+	panic("Used illegal move.")
 }
 
 func getOutcome(opp OppMove, ply PlyMove) Outcome {
@@ -91,13 +95,7 @@ func getOutcome(opp OppMove, ply PlyMove) Outcome {
 			return Draw
 		}
 	}
-	panic("Reached non-deterministic outcome.")
-}
-
-func doesWin(opp OppMove, ply PlyMove) bool {
-	return (opp == OppRock && ply == PlyPaper) ||
-		(opp == OppPaper && ply == PlyScissors) ||
-		(opp == OppScissors && ply == PlyRock)
+	panic("Played non-deterministic outcome.")
 }
 
 func main() {
