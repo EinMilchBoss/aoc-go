@@ -9,9 +9,10 @@ import (
 	"github.com/einmilchboss/aoc-go/aoc"
 )
 
-func partOne(data []byte) (maxCals int) {
+func partOne(data []byte) int {
 	input := string(data)
 
+	var topElf int
 	var cals int
 	for _, elf := range strings.Split(input, "\n\n") {
 		cals = 0
@@ -20,12 +21,12 @@ func partOne(data []byte) (maxCals int) {
 			cals += cal
 		}
 
-		if cals > maxCals {
-			maxCals = cals
+		if cals > topElf {
+			topElf = cals
 		}
 	}
 
-	return
+	return topElf
 }
 
 func partTwo(data []byte) int {
