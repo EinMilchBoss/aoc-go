@@ -15,18 +15,26 @@ type Inputs struct {
 	Actual  []byte
 }
 
-func ReadInputs(year, day uint) Inputs {
-	return Inputs{
-		Example: readInput(year, day, exampleInputFilename),
-		Actual:  readInput(year, day, actualInputFilename),
+func ReadInputs(year, day uint) (inputs Inputs, err error) {
+	var example, actual []byte
+	example, err = readInput(year, day, exampleInputFilename)
+	if err != nil {
+		return
 	}
+	actual, err = readInput(year, day, actualInputFilename)
+	if err != nil {
+		return
+	}
+
+	inputs = Inputs{
+		Example: example,
+		Actual:  actual,
+	}
+	return
 }
 
-func readInput(year, day uint, filename string) []byte {
-	file := fmt.Sprintf("../../res/year%04v/day%02v/%v", year, day, filename)
-	data, err := os.ReadFile(file)
-	if err != nil {
-		panic(fmt.Sprintf("Something went wrong reading input file %s. %s", file, err))
-	}
-	return data
+func readInput(year, day uint, filename string) (data []byte, err error) {
+	file := fmt.Sprintf("./res/year%04v/day%02v/%s", year, day, filename)
+	data, err = os.ReadFile(file)
+	return
 }
