@@ -5,31 +5,31 @@ import (
 	"strings"
 )
 
-type Solution func([]byte) string
+type Solution[T comparable] func([]byte) T
 
-type Part struct {
+type Part[T comparable] struct {
 	number   uint
-	solution Solution
+	solution Solution[T]
 	inputs   *Inputs
 }
 
-func PartOne(inputs *Inputs, solution Solution) Part {
-	return Part{
+func PartOne[T comparable](inputs *Inputs, solution Solution[T]) Part[T] {
+	return Part[T]{
 		number:   1,
 		solution: solution,
 		inputs:   inputs,
 	}
 }
 
-func PartTwo(inputs *Inputs, solution Solution) Part {
-	return Part{
+func PartTwo[T comparable](inputs *Inputs, solution Solution[T]) Part[T] {
+	return Part[T]{
 		number:   2,
 		solution: solution,
 		inputs:   inputs,
 	}
 }
 
-func (p Part) GetTestProtocol(expected string) string {
+func (p Part[T]) GetTestProtocol(expected T) string {
 	solutionResult := p.solution(p.inputs.Example)
 
 	var testResult string
@@ -41,12 +41,12 @@ func (p Part) GetTestProtocol(expected string) string {
 
 	lines := make([]string, 0, 5)
 	lines = append(lines, fmt.Sprintf("--- PART %d ---", p.number))
-	lines = append(lines, fmt.Sprintf("Expected:\n%s", expected))
-	lines = append(lines, fmt.Sprintf("Actual:\n%s", solutionResult))
+	lines = append(lines, fmt.Sprintf("Expected:\n%v", expected))
+	lines = append(lines, fmt.Sprintf("Actual:\n%v", solutionResult))
 	lines = append(lines, fmt.Sprintf("---- %s ----", testResult))
 	return strings.Join(lines, "\n")
 }
 
-func (p Part) Run() string {
+func (p Part[T]) Run() T {
 	return p.solution(p.inputs.Actual)
 }
