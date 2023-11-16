@@ -20,17 +20,17 @@ func partTwo(data []byte) int {
 func sumElvesMaxCal(data []byte, maxN int) int {
 	input := string(data)
 
-	topElves := make([]int, maxN)
+	maxElves := make([]int, maxN)
 	for _, elf := range strings.Split(input, "\n\n") {
 		cals := sumCals(elf)
 
-		idxMin, valMin := findMin(topElves[:])
+		idxMin, valMin := findMin(maxElves[:])
 		if cals > valMin {
-			topElves[idxMin] = cals
+			maxElves[idxMin] = cals
 		}
 	}
 
-	return sum(topElves[:])
+	return sum(maxElves[:])
 }
 
 func sumCals(elf string) int {
