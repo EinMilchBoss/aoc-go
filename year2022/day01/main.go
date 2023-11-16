@@ -10,36 +10,19 @@ import (
 )
 
 func partOne(data []byte) int {
-	input := string(data)
-
-	var topElf int
-	var cals int
-	for _, elf := range strings.Split(input, "\n\n") {
-		cals = 0
-		for _, line := range strings.Split(elf, "\n") {
-			cal, _ := strconv.Atoi(line)
-			cals += cal
-		}
-
-		if cals > topElf {
-			topElf = cals
-		}
-	}
-
-	return topElf
+	return sumElvesMaxCal(data, 1)
 }
 
 func partTwo(data []byte) int {
+	return sumElvesMaxCal(data, 3)
+}
+
+func sumElvesMaxCal(data []byte, maxN int) int {
 	input := string(data)
 
-	var topElves [3]int
-	var cals int
+	topElves := make([]int, maxN)
 	for _, elf := range strings.Split(input, "\n\n") {
-		cals = 0
-		for _, line := range strings.Split(elf, "\n") {
-			cal, _ := strconv.Atoi(line)
-			cals += cal
-		}
+		cals := sumCals(elf)
 
 		idxMin, valMin := findMin(topElves[:])
 		if cals > valMin {
@@ -48,6 +31,15 @@ func partTwo(data []byte) int {
 	}
 
 	return sum(topElves[:])
+}
+
+func sumCals(elf string) int {
+	cals := 0
+	for _, line := range strings.Split(elf, "\n") {
+		cal, _ := strconv.Atoi(line)
+		cals += cal
+	}
+	return cals
 }
 
 func findMin(nums []int) (idxMin int, valMin int) {
