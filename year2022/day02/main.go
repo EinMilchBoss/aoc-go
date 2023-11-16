@@ -8,28 +8,28 @@ import (
 	"github.com/einmilchboss/aoc-go/aoc"
 )
 
-type OppMove rune
+type first rune
 
 const (
-	OppRock     OppMove = 'A'
-	OppPaper    OppMove = 'B'
-	OppScissors OppMove = 'C'
+	fstRock     first = 'A'
+	fstPaper    first = 'B'
+	fstScissors first = 'C'
 )
 
-type PlyMove rune
+type second rune
 
 const (
-	PlyRock     PlyMove = 'X'
-	PlyPaper    PlyMove = 'Y'
-	PlyScissors PlyMove = 'Z'
+	sndRock     second = 'X'
+	sndPaper    second = 'Y'
+	sndScissors second = 'Z'
 )
 
-type Outcome uint
+type outcome uint
 
 const (
-	Defeat = Outcome(iota * 3)
-	Draw
-	Victory
+	defeat = outcome(iota * 3)
+	draw
+	victory
 )
 
 func partOne(data []byte) uint {
@@ -38,11 +38,11 @@ func partOne(data []byte) uint {
 	var points uint
 	for _, line := range strings.Split(input, "\n") {
 		runes := []rune(line)
-		opp, ply := OppMove(runes[0]), PlyMove(runes[2])
-		out := getOutcome(opp, ply)
+		opp, ply := first(runes[0]), second(runes[2])
+		out := deduceOutcome(opp, ply)
 
 		outPoints := uint(out)
-		movePoints := getMovePoints(ply)
+		movePoints := pointsFromSecond(ply)
 		points += outPoints + movePoints
 	}
 
@@ -55,109 +55,105 @@ func partTwo(data []byte) uint {
 	var points uint
 	for _, line := range strings.Split(input, "\n") {
 		runes := []rune(line)
-		first, second := OppMove(runes[0]), PlyMove(runes[2])
-		out := secondToOutcome(second)
-
-		//fmt.Printf("%c %c\n", first, second)
+		opp, out := first(runes[0]), secondToOutcome(second(runes[2]))
+		ply := deducePlayerMove(opp, out)
 
 		outPoints := uint(out)
-		movePoints := uint(getMovePoints(getPlyMove(first, out)))
-
-		//fmt.Println(outPoints, movePoints)
-		points += outPoints + uint(movePoints)
+		movePoints := pointsFromSecond(ply)
+		points += outPoints + movePoints
 	}
 
 	return points
 }
 
-func secondToOutcome(second PlyMove) Outcome {
-	switch second {
-	case PlyRock:
-		return Defeat
-	case PlyPaper:
-		return Draw
-	case PlyScissors:
-		return Victory
+func deduceOutcome(opp first, ply second) outcome {
+	switch opp {
+	case fstRock:
+		switch ply {
+		case sndRock:
+			return draw
+		case sndPaper:
+			return victory
+		case sndScissors:
+			return defeat
+		}
+	case fstPaper:
+		switch ply {
+		case sndRock:
+			return defeat
+		case sndPaper:
+			return draw
+		case sndScissors:
+			return victory
+		}
+	case fstScissors:
+		switch ply {
+		case sndRock:
+			return victory
+		case sndPaper:
+			return defeat
+		case sndScissors:
+			return draw
+		}
 	}
 	panic("Played non-deterministic outcome.")
 }
 
-func getPlyMove(first OppMove, out Outcome) PlyMove {
-	switch first {
-	case OppRock:
-		switch out {
-		case Defeat:
-			return PlyScissors
-		case Draw:
-			return PlyRock
-		case Victory:
-			return PlyPaper
-		}
-	case OppPaper:
-		switch out {
-		case Defeat:
-			return PlyRock
-		case Draw:
-			return PlyPaper
-		case Victory:
-			return PlyScissors
-		}
-	case OppScissors:
-		switch out {
-		case Defeat:
-			return PlyPaper
-		case Draw:
-			return PlyScissors
-		case Victory:
-			return PlyRock
-		}
-	}
-	panic("Used illegal move.")
-}
-
-func getMovePoints(move PlyMove) uint {
-	switch move {
-	case PlyRock:
+func pointsFromSecond(snd second) uint {
+	switch snd {
+	case sndRock:
 		return 1
-	case PlyPaper:
+	case sndPaper:
 		return 2
-	case PlyScissors:
+	case sndScissors:
 		return 3
 	}
 	panic("Used illegal move.")
 }
 
-func getOutcome(opp OppMove, ply PlyMove) Outcome {
-	switch opp {
-	case OppRock:
-		switch ply {
-		case PlyRock:
-			return Draw
-		case PlyPaper:
-			return Victory
-		case PlyScissors:
-			return Defeat
-		}
-	case OppPaper:
-		switch ply {
-		case PlyRock:
-			return Defeat
-		case PlyPaper:
-			return Draw
-		case PlyScissors:
-			return Victory
-		}
-	case OppScissors:
-		switch ply {
-		case PlyRock:
-			return Victory
-		case PlyPaper:
-			return Defeat
-		case PlyScissors:
-			return Draw
-		}
+func secondToOutcome(snd second) outcome {
+	switch snd {
+	case sndRock:
+		return defeat
+	case sndPaper:
+		return draw
+	case sndScissors:
+		return victory
 	}
 	panic("Played non-deterministic outcome.")
+}
+
+func deducePlayerMove(fst first, out outcome) second {
+	switch fst {
+	case fstRock:
+		switch out {
+		case defeat:
+			return sndScissors
+		case draw:
+			return sndRock
+		case victory:
+			return sndPaper
+		}
+	case fstPaper:
+		switch out {
+		case defeat:
+			return sndRock
+		case draw:
+			return sndPaper
+		case victory:
+			return sndScissors
+		}
+	case fstScissors:
+		switch out {
+		case defeat:
+			return sndPaper
+		case draw:
+			return sndScissors
+		case victory:
+			return sndRock
+		}
+	}
+	panic("Used illegal move.")
 }
 
 func main() {
