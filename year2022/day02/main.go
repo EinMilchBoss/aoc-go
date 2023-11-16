@@ -49,8 +49,70 @@ func partOne(data []byte) uint {
 	return points
 }
 
-func partTwo(data []byte) int {
-	return 0
+func partTwo(data []byte) uint {
+	input := string(data)
+
+	var points uint
+	for _, line := range strings.Split(input, "\n") {
+		runes := []rune(line)
+		first, second := OppMove(runes[0]), PlyMove(runes[2])
+		out := secondToOutcome(second)
+
+		//fmt.Printf("%c %c\n", first, second)
+
+		outPoints := uint(out)
+		movePoints := uint(getMovePoints(getPlyMove(first, out)))
+
+		//fmt.Println(outPoints, movePoints)
+		points += outPoints + uint(movePoints)
+	}
+
+	return points
+}
+
+func secondToOutcome(second PlyMove) Outcome {
+	switch second {
+	case PlyRock:
+		return Defeat
+	case PlyPaper:
+		return Draw
+	case PlyScissors:
+		return Victory
+	}
+	panic("Played non-deterministic outcome.")
+}
+
+func getPlyMove(first OppMove, out Outcome) PlyMove {
+	switch first {
+	case OppRock:
+		switch out {
+		case Defeat:
+			return PlyScissors
+		case Draw:
+			return PlyRock
+		case Victory:
+			return PlyPaper
+		}
+	case OppPaper:
+		switch out {
+		case Defeat:
+			return PlyRock
+		case Draw:
+			return PlyPaper
+		case Victory:
+			return PlyScissors
+		}
+	case OppScissors:
+		switch out {
+		case Defeat:
+			return PlyPaper
+		case Draw:
+			return PlyScissors
+		case Victory:
+			return PlyRock
+		}
+	}
+	panic("Used illegal move.")
 }
 
 func getMovePoints(move PlyMove) uint {
@@ -111,5 +173,5 @@ func main() {
 	fmt.Printf("%s\n\n", two.GetTestProtocol(12))
 
 	fmt.Printf("Result part one:\n%v\n", one.Run())
-	//fmt.Printf("Result part two:\n%v\n", two.Run())
+	fmt.Printf("Result part two:\n%v\n", two.Run())
 }
