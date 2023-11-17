@@ -8,16 +8,12 @@ import (
 	"github.com/einmilchboss/aoc-go/aoc"
 )
 
-func partOne(data []byte) uint {
+func partOne(data []byte) (sum uint) {
 	input := string(data)
-
-	var sum uint
 	for _, line := range strings.Split(input, "\n") {
-		len := len(line) / 2
-		left, right := line[:len], line[len:]
-		//fmt.Printf("%s %s\n", left, right)
+		half := len(line) / 2
+		left, right := line[:half], line[half:]
 		for _, r := range left {
-			//fmt.Printf("%c\n", r)
 			if strings.ContainsRune(right, r) {
 				sum += priority(r)
 				break
@@ -28,11 +24,10 @@ func partOne(data []byte) uint {
 	return sum
 }
 
-func partTwo(data []byte) uint {
+func partTwo(data []byte) (sum uint) {
 	input := string(data)
-
-	var sum uint
-	for _, lines := range chunk(strings.Split(input, "\n"), 3) {
+	lines := strings.Split(input, "\n")
+	for _, lines := range chunk(lines, 3) {
 		for _, r := range lines[0] {
 			if strings.ContainsRune(lines[1], r) && strings.ContainsRune(lines[2], r) {
 				sum += priority(r)
@@ -40,17 +35,16 @@ func partTwo(data []byte) uint {
 			}
 		}
 	}
-
-	return sum
+	return
 }
 
-func chunk(lines []string, chunkSize int) [][]string {
-	chunkAmount := len(lines) / chunkSize
-	chunks := make([][]string, 0, chunkAmount)
-	for i := 0; i < chunkAmount; i += 1 {
-		chunk := make([]string, 0, chunkSize)
-		for j := 0; j < chunkSize; j += 1 {
-			chunk = append(chunk, lines[i*chunkSize+j])
+func chunk(lines []string, size int) [][]string {
+	amount := len(lines) / size
+	chunks := make([][]string, 0, amount)
+	for i := 0; i < amount; i += 1 {
+		chunk := make([]string, 0, size)
+		for j := 0; j < size; j += 1 {
+			chunk = append(chunk, lines[i*size+j])
 		}
 		chunks = append(chunks, chunk)
 	}
