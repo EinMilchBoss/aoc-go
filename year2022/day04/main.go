@@ -9,61 +9,53 @@ import (
 	"github.com/einmilchboss/aoc-go/aoc"
 )
 
-type pair struct {
-	from int
-	to   int
+func partOne(data []byte) int {
+	return sumIf(data, func(left, right pair) bool {
+		return left.includesAll(right) || right.includesAll(left)
+	})
 }
 
-func (left pair) includesAll(right pair) bool {
-	return left.from >= right.from && right.to >= left.to
+func partTwo(data []byte) int {
+	return sumIf(data, func(left, right pair) bool {
+		return left.includesAny(right) || right.includesAny(left)
+	})
 }
 
-func (left pair) includesAny(right pair) bool {
-	for l := left.from; l <= left.to; l++ {
-		for r := right.from; r <= right.to; r++ {
-			if l == r {
-				return true
-			}
+func sumIf(data []byte, predicate func(left, right pair) bool) (sum int) {
+	for _, line := range strings.Split(string(data), "\n") {
+		left, right, err := parseLine(line)
+		if err != nil {
+			panic(fmt.Errorf(
+				`encountered an issue for parsing line "%v" due to %w`,
+				line,
+				err,
+			))
 		}
-	}
-	return false
-}
-
-func partOne(data []byte) (sum int) {
-	//fmt.Println(string(data))
-
-	lines := strings.Split(string(data), "\n")
-	for _, line := range lines {
-		sides := strings.SplitN(line, ",", 2)
-		left := parsePair(sides[0])
-		right := parsePair(sides[1])
-		if left.includesAll(right) || right.includesAll(left) {
+		if predicate(left, right) {
 			sum++
 		}
 	}
-
 	return
 }
 
-func partTwo(data []byte) (sum int) {
-	lines := strings.Split(string(data), "\n")
-	for _, line := range lines {
-		sides := strings.SplitN(line, ",", 2)
-		left := parsePair(sides[0])
-		right := parsePair(sides[1])
-		if left.includesAny(right) || right.includesAny(left) {
-			sum++
-		}
+func parseLine(line string) (left, right pair, err error) {
+	sides := strings.SplitN(line, ",", 2)
+	if left, err = parsePair(sides[0]); err != nil {
+		return
 	}
-
+	right, err = parsePair(sides[1])
 	return
 }
 
-func parsePair(side string) pair {
+func parsePair(side string) (p pair, err error) {
 	values := strings.SplitN(side, "-", 2)
-	from, _ := strconv.Atoi(values[0])
-	to, _ := strconv.Atoi(values[1])
-	return pair{from, to}
+	if p.from, err = strconv.Atoi(values[0]); err != nil {
+		return pair{}, err
+	}
+	if p.to, err = strconv.Atoi(values[1]); err != nil {
+		return pair{}, err
+	}
+	return
 }
 
 func main() {
